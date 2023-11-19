@@ -1,0 +1,9 @@
+# Default initial positions for the franka arm's ros2_control fake system
+initial_positions:
+  franka_joint1: 0.0
+  franka_joint2: -0.785
+  franka_joint3: 0.0
+  franka_joint4: -2.356
+  franka_joint5: 0.0
+  franka_joint6: 1.571
+  franka_joint7: 0.785

@@ -1,0 +1,9 @@
+repositories:
+  dep_packages/franka_ros2:
+    type: git
+    url: https://github.com/frankaemika/franka_ros2
+    version: humble
+  dep_packages/moveit_task_constructor:
+    type: git
+    url: https://github.com/ros-planning/moveit_task_constructor
+    version: humble

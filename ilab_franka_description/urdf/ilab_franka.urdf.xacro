@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="franka">
+  <xacro:arg name="arm_id" default="franka"/> <!-- Name of this franka -->
+  <xacro:arg name="hand" default="false"/> <!-- Should a franka_gripper be mounted at the flange?" -->
+  <xacro:arg name="robot_ip" default="0.0.0.0"/> <!-- IP address or hostname of the robot" -->
+  <xacro:arg name="use_fake_hardware" default="true"/>
+  <xacro:arg name="fake_sensor_commands" default="false"/>
+  <xacro:arg name="use_sim" default="false"/>
+  <xacro:arg name="tcp_xyz" default="0 0 0.1034" />
+  <xacro:arg name="tcp_rpy" default="0 0 0" />
+  <xacro:arg name="base_frame_file" default="$(find ilab_franka_description)/config/base_frame.yaml" />
+  <xacro:arg name="namespace" default="/" />
+
+
+  <link name="world"/>
+
+  <xacro:property name="base_frame_file" value="$(arg base_frame_file)"/>
+  <xacro:property name="base_frame" value="${xacro.load_yaml(base_frame_file)['base_frame']}"/>
+
+  <xacro:include filename="$(find ilab_franka_description)/urdf/flexicart.xacro"/>
+  <xacro:flexicart
+    ns="$(arg arm_id)"
+    connected_to="world" 
+    xyz="${base_frame['x']} ${base_frame['y']} ${base_frame['z']}"
+    rpy="${base_frame['roll']} ${base_frame['pitch']} ${base_frame['yaw']}"
+  />
+
+  <xacro:include filename="$(find ilab_franka_description)/urdf/franka_robot.xacro"/>
+  <xacro:franka_robot 
+    arm_id="$(arg arm_id)"
+    joint_limits="${xacro.load_yaml('$(find ilab_franka_description)/urdf/joint_limits.yaml')}"
+    hand="$(arg hand)"
+    gazebo="$(arg use_sim)"
+    parent="$(arg arm_id)_flexicart_robot_base"
+    tcp_xyz="$(arg tcp_xyz)"
+    tcp_rpy="$(arg tcp_rpy)"
+    xyz='0 0 0'
+    rpy='0 0 1.5707'
+    namespace="$(arg namespace)"
+  />
+
+  <xacro:include filename="$(find ilab_franka_description)/ros2_control/ilab_franka.ros2_control.xacro"/>
+  <xacro:franka_arm_ros2_control 
+    ns="$(arg arm_id)"
+    robot_ip="$(arg robot_ip)"
+    use_fake_hardware="$(arg use_fake_hardware)"
+    use_sim="$(arg use_sim)"
+    fake_sensor_commands="$(arg fake_sensor_commands)"
+  />
+
+</robot>

@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="franka">
+
+  <xacro:arg name="arm_id" default="franka"/> <!-- Name of this franka -->
+  <xacro:arg name="hand" default="true"/> <!-- Should a franka_gripper be mounted at the flange? (Currently does not work without it) -->
+
+  <xacro:property name="arm_id" value="$(arg arm_id)"/>
+
+  <xacro:include filename="$(find ilab_franka_description)/srdf/flexicart.xacro"/>
+  <xacro:flexicart arm_id="${arm_id}"/>
+
+  <xacro:include filename="$(find ilab_franka_description)/srdf/franka_arm.xacro"/>
+  <xacro:franka_arm arm_id="${arm_id}"/>
+
+  <xacro:if value="$(arg hand)">
+    <xacro:include filename="$(find ilab_franka_description)/srdf/hand.xacro"/>
+    <xacro:hand arm_id="${arm_id}"/>
+
+    <xacro:include filename="$(find ilab_franka_description)/srdf/franka_arm_hand.xacro"/>
+    <xacro:franka_arm_hand arm_id="${arm_id}"/>
+  </xacro:if>
+</robot>
