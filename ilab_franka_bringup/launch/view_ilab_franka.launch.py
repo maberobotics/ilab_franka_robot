@@ -41,7 +41,7 @@ def generate_launch_description():
                         'end-effector otherwise'),
         DeclareLaunchArgument(
             'namespace',
-            default_value='/franka',
+            default_value='/',
             description='Robot Namespace'),
         Node(
             package='robot_state_publisher',

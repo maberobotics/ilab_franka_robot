@@ -101,12 +101,12 @@ void MTCTaskNode::doTask()
   }
   task_.introspection().publishSolution(*task_.solutions().front());
 
-  auto result = task_.execute(*task_.solutions().front());
-  if (result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, "Task execution failed");
-    return;
-  }
+  // auto result = task_.execute(*task_.solutions().front());
+  // if (result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
+  // {
+  //   RCLCPP_ERROR_STREAM(LOGGER, "Task execution failed");
+  //   return;
+  // }
 
   return;
 }

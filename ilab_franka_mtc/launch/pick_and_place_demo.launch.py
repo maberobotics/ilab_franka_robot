@@ -35,7 +35,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             'namespace',
-            default_value='/franka/',
+            default_value='/',
             description='Namespace of launched nodes, useful for multi-robot setup. \
                          If changed than also the namespace in the controllers \
                          configuration needs to be updated. Expected format "<ns>/".',
