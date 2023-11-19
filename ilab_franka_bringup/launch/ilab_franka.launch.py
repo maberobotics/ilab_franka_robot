@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-import os
-
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, RegisterEventHandler
 from launch.conditions import IfCondition, UnlessCondition
@@ -93,10 +90,17 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             'namespace',
-            default_value='/franka/',
+            default_value='/',
             description='Namespace of launched nodes, useful for multi-robot setup. \
                          If changed than also the namespace in the controllers \
                          configuration needs to be updated. Expected format "<ns>/".',
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            'merge_joint_states',
+            default_value='true',
+            description='Merge joint states topics into /joint_states.',
         )
     )
 
@@ -110,6 +114,7 @@ def generate_launch_description():
     namespace = LaunchConfiguration('namespace')
     base_frame_file = LaunchConfiguration('base_frame_file')
     start_gazebo = LaunchConfiguration('start_gazebo')
+    merge_joint_states = LaunchConfiguration('merge_joint_states')
 
     # Get URDF via xacro
     robot_description_content = Command(
@@ -133,6 +138,9 @@ def generate_launch_description():
             ' ',
             'robot_ip:=',
             robot_ip,
+            ' ',
+            'base_frame_file:=',
+            base_frame_file,
             ' ',
             'namespace:=',
             namespace,
@@ -186,6 +194,7 @@ def generate_launch_description():
         namespace=namespace,
         parameters=[
             {'source_list': ['franka_arm/joint_states', 'franka_gripper/joint_states'], 'rate': 30}],
+        condition=IfCondition(merge_joint_states),
     )
 
     robot_state_pub_node = Node(
