@@ -7,7 +7,7 @@
   <xacro:property name="arm_id" value="$(arg arm_id)"/>
 
   <xacro:include filename="$(find ilab_franka_description)/srdf/flexicart.xacro"/>
-  <xacro:flexicart arm_id="${arm_id}"/>
+  <xacro:franka_flexicart arm_id="${arm_id}"/>
 
   <xacro:include filename="$(find ilab_franka_description)/srdf/franka_arm.xacro"/>
   <xacro:franka_arm arm_id="${arm_id}"/>
