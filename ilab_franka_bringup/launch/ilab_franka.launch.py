@@ -59,7 +59,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             'use_planning',
-            default_value='false',
+            default_value='true',
             description='Start robot with Moveit2 `move_group` planning \
                          config for Pilz and OMPL.',
         )
@@ -74,7 +74,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             'robot_ip',
-            default_value='0.0.0.0',
+            default_value='172.16.0.2',
             description='Robot IP of FRI interface',
         )
     )
@@ -248,7 +248,7 @@ def generate_launch_description():
                           'use_fake_hardware': use_fake_hardware,
                           'arm_id': arm_id,
                           'namespace': namespace}.items(),
-        condition=UnlessCondition(use_fake_hardware),
+        condition=UnlessCondition(use_fake_hardware) and UnlessCondition(use_sim),
     )
 
     joint_state_broadcaster_spawner = Node(
@@ -261,12 +261,21 @@ def generate_launch_description():
         package='controller_manager',
         executable='spawner',
         arguments=['franka_arm_controller', '-c', [namespace, 'controller_manager']]
+        ondition=IfCondition(use_fake_hardware) or IfCondition(use_sim)
+    )
+
+    robot_effort_controller_spawner = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['franka_effort_arm_controller', '-c', [namespace, 'controller_manager']],
+        condition=UnlessCondition(use_fake_hardware) and UnlessCondition(use_sim),
     )
 
     hand_controller_spawner = Node(
         package='controller_manager',
         executable='spawner',
-        arguments=['franka_hand_controller', '-c', [namespace, 'controller_manager']]
+        arguments=['franka_hand_controller', '-c', [namespace, 'controller_manager']],
+        condition=IfCondition(use_fake_hardware) or IfCondition(use_sim)
     )
 
     # Delay `joint_state_broadcaster` after spawn_entity
@@ -301,7 +310,17 @@ def generate_launch_description():
         event_handler=OnProcessExit(
             target_action=joint_state_broadcaster_spawner,
             on_exit=[robot_controller_spawner],
-        )
+        ),
+        condition=IfCondition(use_fake_hardware),
+    )
+
+    # Delay start of robot_controller after `joint_state_broadcaster`
+    delay_robot_effort_controller_spawner_after_joint_state_broadcaster_spawner = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=joint_state_broadcaster_spawner,
+            on_exit=[robot_effort_controller_spawner],
+        ),
+        condition=UnlessCondition(use_fake_hardware),
     )
 
     nodes = [
@@ -316,6 +335,7 @@ def generate_launch_description():
         delay_joint_state_broadcaster_spawner_after_spawn_entity,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
+        delay_robot_effort_controller_spawner_after_joint_state_broadcaster_spawner,
         hand_controller_spawner,
     ]
 
