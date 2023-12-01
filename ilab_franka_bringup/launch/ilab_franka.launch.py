@@ -260,8 +260,8 @@ def generate_launch_description():
     robot_controller_spawner = Node(
         package='controller_manager',
         executable='spawner',
-        arguments=['franka_arm_controller', '-c', [namespace, 'controller_manager']]
-        ondition=IfCondition(use_fake_hardware) or IfCondition(use_sim)
+        arguments=['franka_arm_controller', '-c', [namespace, 'controller_manager']],
+        condition=IfCondition(use_fake_hardware) or IfCondition(use_sim)
     )
 
     robot_effort_controller_spawner = Node(
